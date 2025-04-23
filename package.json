@@ -1,8 +1,9 @@
 {
   "name": "tweet-hunt",
   "displayName": "Xhunt - 探索加密币的推特智能助手",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Twitter Crypto Analytics Agent",
+  "homepage_url": "https://github.com/AlphaHunt3/tweet-hunt-extension",
   "author": "StackBlitz",
   "scripts": {
     "dev": "plasmo dev",
