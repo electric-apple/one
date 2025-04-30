@@ -4,7 +4,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 async function main() {
     const transport = new StdioClientTransport({
         command: "ts-node",
-        args: ["index.ts"]
+        args: ["server.ts"]
     });
 
     const client = new Client(
