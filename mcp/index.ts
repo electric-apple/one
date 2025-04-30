@@ -214,7 +214,10 @@ server.prompt('what-happened-in-transaction',
     })
 );
 
+async function main() {
+    // Start receiving messages on stdin and sending messages on stdout
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+}
 
-// Start receiving messages on stdin and sending messages on stdout
-const transport = new StdioServerTransport();
-server.connect(transport);
+main();
