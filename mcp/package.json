@@ -1,39 +1,24 @@
 {
-  "name": "solana-mcp",
+  "name": "solana-dev-mcp",
   "version": "1.0.0",
-  "description": "A Model Context Protocol server for interacting with the Solana blockchain, powered by the Solana Agent Kit (https://github.com/sendaifun/solana-agent-kit)",
-  "main": "build/index.js",
-  "type": "module",
-  "bin": {
-    "solana-mcp": "./build/index.js"
-  },
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node build/index.js",
-    "dev": "tsx watch src/index.ts"
+    "start": "ts-node index.ts",
+    "generate-config": "echo '{\"mcpServers\":{\"solana-dev\":{\"command\":\"ts-node\",\"args\":[\"'$(pwd)'/index.ts\"]}}}'",
+    "generate-config:js": "echo '{\"mcpServers\":{\"solana-dev\":{\"command\":\"node\",\"args\":[\"'$(pwd)'/dist/index.js\"]}}}'"
   },
-  "files": [
-    "build"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sendaifun/solana-mcp"
-  },
-  "keywords": [
-    "solana",
-    "mcp",
-    "solana-agent-kit",
-    "solana-mcp"
-  ],
-  "author": "sendaifun",
-  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@9.10.0+sha512.73a29afa36a0d092ece5271de5177ecbf8318d454ecd701343131b8ebc0c1a91c487da46ab77c8e596d6acf1461e3594ced4becedf8921b074fbd8653ed7051c",
   "dependencies": {
-    "dotenv": "^16.4.7",
-    "solana-agent-kit": "1.4.9"
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@solana/web3.js": "^1.98.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@types/node": "^22.13.4",
-    "typescript": "^5.7.3"
-  },
-  "packageManager": "pnpm@9.14.2"
+    "@types/node": "^22.13.10"
+  }
 }
