@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import {z} from "zod";
 import axios from "axios";
+import 'dotenv/config';
 const app = express();
 app.use(express.json());
 
@@ -32,7 +33,7 @@ function getServer() {
         { ticker: z.string(), ca: z.string() },
         async ({ ticker, ca }) => {
             try {
-                const { data: res } = await axios.post(`Xhunt token analysis endpoint`, {"ticker": ticker, "ca": ca});
+                const { data: res } = await axios.post(`${process.env.TOKEN_ANALYSIS}`, {"ticker": ticker, "ca": ca});
                 if (res && res.code === 200 && res.data) {
                     return {
                         content: [{ type: "text", text: res.data.answerDS }, { type: "text", text: JSON.stringify(res.data.tweets)}]
