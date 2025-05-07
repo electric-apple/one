@@ -29,13 +29,13 @@ function getServer() {
     server.tool(
         "getTokenAnalysis",
         "Analyze a token based on Twitter social data",
-        { ticker: z.string() },
-        async ({ ticker }) => {
+        { ticker: z.string(), ca: z.string() },
+        async ({ ticker, ca }) => {
             try {
-                const { data: res } = await axios.post(`Xhunt token analysis endpoint`, {"ticker": ticker});
+                const { data: res } = await axios.post(`Xhunt token analysis endpoint`, {"ticker": ticker, "ca": ca});
                 if (res && res.code === 200 && res.data) {
                     return {
-                        content: [{ type: "text", text: res.data.answer }]
+                        content: [{ type: "text", text: res.data.answerDS }, { type: "text", text: JSON.stringify(res.data.tweets)}]
                     };
                 } else {
                     return {

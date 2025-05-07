@@ -44,13 +44,13 @@ class MCPClient {
         }
     }
 
-    async callTool(name: string) {
+    async callTool(name: string, ticker="", ca="") {
         try {
             console.log('\nCalling tool: ', name);
 
             const result  = await this.client.callTool({
                 name: "getTokenAnalysis",
-                arguments: { ticker: "BTC"},
+                arguments: { ticker: ticker, ca: ca},
             })
 
             const content = result.content as object[]
@@ -99,7 +99,7 @@ async function main() {
     try {
         await client.connectToServer("http://localhost:3000/mcp")
         await client.listTools()
-        await client.callTool("getTokenAnalysis")
+        await client.callTool("getTokenAnalysis", "BTC")
         await client.waitForCompletion()
     } finally {
         await client.cleanup()

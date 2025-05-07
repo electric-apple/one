@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/tweet-hunt-extension-开源.iml" filepath="$PROJECT_DIR$/.idea/tweet-hunt-extension-开源.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/tweet-hunt-extension.iml" filepath="$PROJECT_DIR$/.idea/tweet-hunt-extension.iml" />
     </modules>
   </component>
 </project>
