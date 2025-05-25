@@ -39,6 +39,7 @@ export function extractUsernameFromUrl(url: string): string {
       'search',        // 搜索页
       'settings',      // 设置页
       'i',             // 内部页面（如设置子页面）
+      'logout',        // 登出
     ]);
 
     // 如果路径的第一个部分是导航页面，则返回空字符串
@@ -97,3 +98,78 @@ export function getMBTIColor(mbti: string) {
   };
   return colors[mbti] || 'text-blue-400';
 };
+
+export function openNewTab(url: string) {
+  const win = window.open(url, '_blank');
+  if (!win || win.closed) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer'; // 安全设置
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+}
+
+export type URLParams = {
+  [key: string]: string | string[];
+};
+
+/**
+ * 解析 URL 查询参数为对象
+ *
+ * @param url - 包含查询参数的完整 URL 或仅查询字符串部分
+ * @returns 解析后的参数对象
+ */
+export function parseURLParams(url: string): URLParams {
+  // 提取查询字符串部分
+  const queryString = url.split('?')[1] || url;
+
+  // 创建 URLSearchParams 对象
+  const params = new URLSearchParams(queryString);
+  const result: URLParams = {};
+
+  for (const [key, value] of params.entries()) {
+    if (!result[key]) {
+      // 第一次出现，直接赋值
+      result[key] = value;
+    } else {
+      const existingValue = result[key];
+      if (Array.isArray(existingValue)) {
+        // 已是数组，push 新值
+        existingValue.push(value);
+      } else {
+        // 首次重复，转为数组
+        result[key] = [existingValue, value];
+      }
+    }
+  }
+
+  return result;
+}
+
+
+/**
+ * 计算标签字符长度（中文按 4 字符计算）
+ */
+export function calculateTagCharLength(tag: string) {
+  if (typeof tag !== 'string') return 0;
+  let length = 0;
+  for (let i = 0; i < tag.length; i++) {
+    const charCode = tag.charCodeAt(i);
+    // 判断是否是汉字或宽字符（CJK Unicode）
+    if ((charCode >= 0x4e00 && charCode <= 0x9fa5) || // 中文
+      charCode === 0x300c || charCode === 0x300d || // 「」
+      charCode === 0x300e || charCode === 0x300f || // 《》
+      charCode === 0x3010 || charCode === 0x3011) { // 【】
+      length += 4;
+    } else if (charCode > 127 || charCode === 94) { // 其他宽字符或 ^
+      length += 2;
+    } else {
+      length += 1;
+    }
+  }
+  return length;
+}

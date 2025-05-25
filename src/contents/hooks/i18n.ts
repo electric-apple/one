@@ -1,6 +1,6 @@
 import zh from '../../locales/zh.json';
 import en from '../../locales/en.json'
-import { useStorage } from '@plasmohq/storage/dist/hook';
+import { useStorage } from '@plasmohq/storage/hook';
 import { useCallback, useEffect, useMemo } from 'react';
 import { isUserUsingChinese } from '~contents/utils';
 
@@ -21,6 +21,7 @@ export const useI18n = () => {
   }, [lang]);
   const t = useCallback((str: string) => {
     try {
+      // @ts-ignore
       return _t[str] || str;
     } catch (err) {
       return str;

@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { extractUsernameFromUrl } from '~contents/utils';
 import useCurrentUrl from '~contents/hooks/useCurrentUrl.ts';
 import { AccountsResponse, DeletedTweet, InvestmentData, KolData } from '~types';
+import { getHandeReviewInfo, updateUserInfo } from '~contents/services/review.ts';
+import { ReviewStats, UserInfo } from '~types/review.ts';
+import { useStorage } from '@plasmohq/storage/hook';
 
 export interface MainData {
   currentUrl: string;
@@ -17,12 +20,19 @@ export interface MainData {
   loadingRootData: boolean;
   renameInfo: AccountsResponse | null;
   loadingRenameInfo: boolean;
+  reviewInfo: ReviewStats | null;
+  loadingReviewInfo: boolean;
+  refreshAsyncReviewInfo: () => Promise<ReviewStats | undefined>;
+  userInfo: UserInfo | null;
+  loadingUserInfo: boolean;
+  refreshAsyncUserInfo: () => Promise<UserInfo | undefined>;
 }
 
 const useMainData = (): MainData => {
   const currentUrl = useCurrentUrl();
   const [userId, setUserId] = useState('');
-  // const userName = useTwitterUserInfo();
+  const [reviewOnlyKol] = useStorage('@xhunt/reviewOnlyKol', true);
+  const [token] = useStorage('@xhunt/token', '');
   const { data: deletedTweets = [] as DeletedTweet[], run: fetchDelData, loading: loadingDel } = useRequest(() => fetchDelTwitterInfo(userId), {
     refreshDeps: [userId],
     debounceWait: 300,
@@ -53,22 +63,43 @@ const useMainData = (): MainData => {
     debounceLeading: true,
     debounceTrailing: false,
   });
+  const { data: reviewInfo = null, run: fetchReviewInfo, loading: loadingReviewInfo, refreshAsync: refreshAsyncReviewInfo } = useRequest(() => getHandeReviewInfo(userId, reviewOnlyKol), {
+    refreshDeps: [userId, reviewOnlyKol],
+    debounceWait: 300,
+    manual: true,
+    debounceLeading: true,
+    debounceTrailing: false,
+  });
+  const { data: userInfo = null, run: fetchUserInfo, loading: loadingUserInfo, refreshAsync: refreshAsyncUserInfo } = useRequest(() => updateUserInfo(), {
+    refreshDeps: [token],
+    debounceWait: 300,
+    manual: true,
+    debounceLeading: true,
+    debounceTrailing: false,
+  });
 
   const loadData = useLockFn(async () => {
-    if (!userId || String(userId) <= 4) return;
+    if (!userId || String(userId).length <= 4) return;
     fetchDelData();
     fetchTwitterData();
     fetchRootData();
     fetchRenameInfo();
+    fetchReviewInfo();
   });
-
+  useEffect(() => {
+    if (!userId || String(userId).length <= 4) return;
+    fetchReviewInfo();
+  }, [reviewOnlyKol, token]);
   useEffect(() => {
     loadData().then(r => r);
   }, [userId]);
+  useEffect(() => {
+    fetchUserInfo();
+  }, [])
   useDebounceEffect(() => {
     const uid = extractUsernameFromUrl(currentUrl);
     setUserId(uid);
-  }, [currentUrl], { wait: 500 });
+  }, [currentUrl], { wait: 300 });
   return {
     currentUrl,
     userId,
@@ -80,7 +111,13 @@ const useMainData = (): MainData => {
     rootData,
     loadingRootData,
     renameInfo,
-    loadingRenameInfo
+    loadingRenameInfo,
+    reviewInfo,
+    loadingReviewInfo,
+    refreshAsyncReviewInfo,
+    userInfo,
+    loadingUserInfo,
+    refreshAsyncUserInfo,
   }
 }
 

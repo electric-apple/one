@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDebounceEffect } from 'ahooks';
 import useCurrentUrl from '~contents/hooks/useCurrentUrl.ts';
+import { useStorage } from '@plasmohq/storage/hook';
 
 export interface UseShadowContainerOptions {
   /** 初步查找的选择器 */
@@ -49,6 +50,7 @@ export default function useShadowContainer({
   maxWaitTime = 30000,
   siblingsStyle = 'width:auto;height:auto;max-width:100%;',
 }: UseShadowContainerOptions): ShadowRoot | null {
+  const [theme] = useStorage('@xhunt/theme', 'dark');
   const [shadowRoot, setShadowRoot] = useState<ShadowRoot | null>(null);
   const currentUrl = useCurrentUrl();
   // 用于标记是否已经创建过容器，避免重复创建
@@ -71,7 +73,7 @@ export default function useShadowContainer({
       const baseEl = document.querySelector(selector);
       if (!baseEl) return false;
 
-      let target: Element | null = null as Element;
+      let target: Element | null = null as unknown as Element;
       if (useSiblings) {
         // 如果没有提供 targetFilter，则在 baseEl 后面新建一个 div 作为坑位
         if (!targetFilter) {
@@ -105,8 +107,9 @@ export default function useShadowContainer({
           shadow.appendChild(slotEl);
           shadow.appendChild(styleEl);
           target.setAttribute('data-plasmo-shadow-container', 'true');
+          target.setAttribute('data-theme', theme);
+          target.setAttribute('style', 'z-index: 1;');
         } catch (e) {
-          // console.error('Error attaching shadow:', e);
           return false;
         }
       } else {
@@ -136,13 +139,11 @@ export default function useShadowContainer({
     // 设置最大等待时间
     timeoutId = setTimeout(() => {
       observer && observer.disconnect();
-      // console.warn(`useShadowContainer: Timeout reached (${maxWaitTime}ms), target element not found.`);
     }, Number(maxWaitTime));
 
     return () => {
       observer && observer.disconnect();
       if (timeoutId) {
-        // console.info('useShadowContainer: Cleanup observer and timeout.')
         clearTimeout(timeoutId);
       }
     };
